@@ -1,0 +1,59 @@
+import { z } from "zod";
+
+/** 24-character hex MongoDB ObjectId string (validated without importing mongoose in Edge-bound code). */
+const objectId = z.string().regex(/^[a-fA-F0-9]{24}$/, "Invalid id");
+
+export const loginSchema = z.object({
+  email: z.string().email().max(320),
+  password: z.string().min(8).max(256),
+});
+
+export const bootstrapAdminSchema = z.object({
+  email: z.string().email().max(320),
+  password: z.string().min(10).max(256),
+});
+
+export const studentCreateSchema = z.object({
+  name: z.string().min(1).max(120).trim(),
+  studentId: z.string().min(1).max(80).trim(),
+  class: z.string().min(1).max(80).trim(),
+});
+
+export const studentUpdateSchema = studentCreateSchema.partial();
+
+export const sessionCreateSchema = z.object({
+  name: z.string().min(1).max(80).trim(),
+});
+
+export const sessionUpdateSchema = sessionCreateSchema.partial();
+
+export const weekCreateSchema = z.object({
+  weekNumber: z.coerce.number().int().min(1),
+  sessionId: objectId,
+});
+
+export const weekUpdateSchema = z
+  .object({
+    weekNumber: z.coerce.number().int().min(1).optional(),
+    sessionId: objectId.optional(),
+  })
+  .refine(
+    (d) =>
+      d.weekNumber !== undefined || d.sessionId !== undefined,
+    "Nothing to update",
+  );
+
+export const scoreUpsertSchema = z.object({
+  studentId: objectId,
+  weekId: objectId,
+  score: z.coerce.number().finite(),
+});
+
+export const scoreUpdateSchema = z.object({
+  score: z.coerce.number().finite(),
+});
+
+export type StudentCreateInput = z.infer<typeof studentCreateSchema>;
+export type ScoreUpsertInput = z.infer<typeof scoreUpsertSchema>;
+
+export { objectId };

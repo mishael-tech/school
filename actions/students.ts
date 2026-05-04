@@ -37,6 +37,7 @@ export async function createStudentAction(formData: FormData): Promise<void> {
     redirect(`/admin/students?error=${q(msg)}`);
   }
   revalidatePath("/admin/students");
+  revalidatePath("/standings");
   redirect("/admin/students?ok=1");
 }
 
@@ -75,6 +76,7 @@ export async function updateStudentFormAction(formData: FormData): Promise<void>
     redirect(`/admin/students/${id}?error=${q(msg)}`);
   }
   revalidatePath("/admin/students");
+  revalidatePath("/standings");
   redirect("/admin/students?ok=1");
 }
 
@@ -84,5 +86,6 @@ export async function deleteStudentAction(formData: FormData): Promise<ActionRes
   const ok = await deleteStudent(id);
   if (!ok) return { error: "Not found." };
   revalidatePath("/admin/students");
+  revalidatePath("/standings");
   return { ok: true };
 }

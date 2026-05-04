@@ -7,6 +7,9 @@ import { Week } from "@/models/Week";
 
 export async function createSession(payload: {
   name: string;
+  announcementTitle?: string;
+  announcementBody?: string;
+  groupPhotoUrl?: string;
 }): Promise<SessionDocument> {
   await connectDB();
   return SessionDoc.create(payload);
@@ -14,7 +17,12 @@ export async function createSession(payload: {
 
 export async function updateSession(
   id: string,
-  payload: { name?: string },
+  payload: {
+    name?: string;
+    announcementTitle?: string;
+    announcementBody?: string;
+    groupPhotoUrl?: string;
+  },
 ): Promise<SessionDocument | null> {
   await connectDB();
   if (!mongoose.Types.ObjectId.isValid(id)) return null;

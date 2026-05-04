@@ -42,7 +42,7 @@ export async function upsertScoreAction(formData: FormData): Promise<void> {
   } catch {
     redirect(scoresPath(weekId || undefined, "Could not save score."));
   }
-  revalidatePath("/leaderboard");
+  revalidatePath("/standings");
   revalidatePath("/admin/scores");
   redirect(scoresPath(weekId || undefined, undefined, true));
 }
@@ -69,7 +69,7 @@ export async function updateScoreNumericAction(formData: FormData): Promise<void
   if (!updated) {
     redirect(scoresPath(weekId || undefined, "Score row not found."));
   }
-  revalidatePath("/leaderboard");
+  revalidatePath("/standings");
   revalidatePath("/admin/scores");
   redirect(scoresPath(weekId || undefined, undefined, true));
 }
@@ -81,7 +81,7 @@ export async function deleteScoreFormAction(
   if (!id) return { error: "Missing id." };
   const ok = await deleteScore(id);
   if (!ok) return { error: "Not found." };
-  revalidatePath("/leaderboard");
+  revalidatePath("/standings");
   revalidatePath("/admin/scores");
   return { ok: true };
 }

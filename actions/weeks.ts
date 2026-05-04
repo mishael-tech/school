@@ -31,6 +31,7 @@ export async function createWeekAction(formData: FormData): Promise<void> {
   }
   revalidatePath("/admin/weeks");
   revalidatePath("/");
+  revalidatePath("/standings");
   redirect("/admin/weeks?ok=1");
 }
 
@@ -65,6 +66,7 @@ export async function updateWeekFormAction(formData: FormData): Promise<void> {
   }
   revalidatePath("/admin/weeks");
   revalidatePath("/");
+  revalidatePath("/standings");
   redirect("/admin/weeks?ok=1");
 }
 
@@ -76,5 +78,6 @@ export async function deleteWeekAction(formData: FormData): Promise<ActionResult
   revalidatePath("/admin/weeks");
   revalidatePath("/admin/scores");
   revalidatePath("/");
+  revalidatePath("/standings");
   return { ok: true };
 }

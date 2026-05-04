@@ -7,7 +7,10 @@ import {
   deleteSession,
   updateSession,
 } from "@/services/session.service";
-import { sessionCreateSchema, sessionUpdateSchema } from "@/utils/validators";
+import {
+  sessionAdminUpdateSchema,
+  sessionCreateSchema,
+} from "@/utils/validators";
 
 export type ActionResult = { ok?: true; error?: string };
 
@@ -32,6 +35,7 @@ export async function createSessionAction(formData: FormData): Promise<void> {
   }
   revalidatePath("/admin/sessions");
   revalidatePath("/");
+  revalidatePath("/standings");
   redirect("/admin/sessions?ok=1");
 }
 
@@ -40,12 +44,15 @@ export async function updateSessionFormAction(formData: FormData): Promise<void>
   if (!id) redirect(`/admin/sessions?error=${q("Missing session id.")}`);
 
   const raw = {
-    name: formData.get("name") != null ? String(formData.get("name")) : undefined,
+    name: String(formData.get("name") ?? ""),
+    announcementTitle: String(formData.get("announcementTitle") ?? ""),
+    announcementBody: String(formData.get("announcementBody") ?? ""),
+    groupPhotoUrl: String(formData.get("groupPhotoUrl") ?? ""),
   };
-  const parsed = sessionUpdateSchema.safeParse(raw);
+  const parsed = sessionAdminUpdateSchema.safeParse(raw);
   if (!parsed.success) {
     redirect(
-      `/admin/sessions/${id}?error=${q(parsed.error.flatten().formErrors.join(" ") || "Invalid input")}`,
+      `/admin/sessions/${id}?error=${q(parsed.error.flatten().formErrors.join(" ") || parsed.error.issues[0]?.message || "Invalid input")}`,
     );
   }
   try {
@@ -58,6 +65,7 @@ export async function updateSessionFormAction(formData: FormData): Promise<void>
   }
   revalidatePath("/admin/sessions");
   revalidatePath("/");
+  revalidatePath("/standings");
   redirect("/admin/sessions?ok=1");
 }
 
@@ -70,5 +78,6 @@ export async function deleteSessionAction(formData: FormData): Promise<ActionRes
   revalidatePath("/admin/weeks");
   revalidatePath("/admin/scores");
   revalidatePath("/");
+  revalidatePath("/standings");
   return { ok: true };
 }

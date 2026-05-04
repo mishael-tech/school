@@ -31,6 +31,19 @@ export const sessionCreateSchema = z.object({
 
 export const sessionUpdateSchema = sessionCreateSchema.partial();
 
+const optionalUrlOrEmpty = z.union([
+  z.literal(""),
+  z.string().url().max(2048),
+]);
+
+/** Admin edit form includes name plus public standings content */
+export const sessionAdminUpdateSchema = z.object({
+  name: z.string().min(1).max(80).trim(),
+  announcementTitle: z.string().max(200).trim(),
+  announcementBody: z.string().max(8000).trim(),
+  groupPhotoUrl: optionalUrlOrEmpty,
+});
+
 export const weekCreateSchema = z.object({
   weekNumber: z.coerce.number().int().min(1),
   sessionId: objectId,

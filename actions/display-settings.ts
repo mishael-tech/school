@@ -27,6 +27,7 @@ export async function subjectSettingsAction(
     return { error: "Could not save settings. Check database connection." };
   }
   revalidatePath("/", "layout");
+  revalidatePath("/standings");
   revalidatePath("/leaderboard");
   revalidatePath("/admin/settings");
   return { ok: true, error: undefined };

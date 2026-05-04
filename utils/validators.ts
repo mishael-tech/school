@@ -70,6 +70,17 @@ export const scoreUpdateSchema = z.object({
   score: z.coerce.number().finite(),
 });
 
+export const scoreGridCellSchema = z.object({
+  studentId: objectId,
+  weekId: objectId,
+  score: z.union([z.number().finite(), z.null()]),
+});
+
+export const scoreGridBatchSchema = z.object({
+  sessionId: objectId,
+  cells: z.array(scoreGridCellSchema).max(5000),
+});
+
 export type StudentCreateInput = z.infer<typeof studentCreateSchema>;
 export type ScoreUpsertInput = z.infer<typeof scoreUpsertSchema>;
 

@@ -3,6 +3,33 @@ import { connectDB } from "@/lib/db";
 import type { ScoreDocument } from "@/models/Score";
 import { Score } from "@/models/Score";
 
+/** Set numeric score or clear the cell (removes the score document when null). */
+export async function setScoreCell(payload: {
+  studentId: string;
+  weekId: string;
+  score: number | null;
+}): Promise<void> {
+  if (payload.score !== null) {
+    await upsertScore({
+      studentId: payload.studentId,
+      weekId: payload.weekId,
+      score: payload.score,
+    });
+    return;
+  }
+  await connectDB();
+  if (
+    !mongoose.Types.ObjectId.isValid(payload.studentId) ||
+    !mongoose.Types.ObjectId.isValid(payload.weekId)
+  ) {
+    throw new Error("Invalid student or week ID");
+  }
+  await Score.deleteOne({
+    studentId: new mongoose.Types.ObjectId(payload.studentId),
+    weekId: new mongoose.Types.ObjectId(payload.weekId),
+  }).exec();
+}
+
 export async function upsertScore(payload: {
   studentId: string;
   weekId: string;

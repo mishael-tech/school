@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import mongoose from "mongoose";
-import { updateSessionAction } from "@/actions/sessions";
-import { sealFormAction } from "@/lib/seal-form-action";
+import { updateSessionFormAction } from "@/actions/sessions";
+import { FormFlash } from "@/components/admin/FormFlash";
 import { getSessionById } from "@/services/session.service";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ error?: string }>;
+};
 
 export default async function EditSessionPage(props: Props) {
   const { id } = await props.params;
+  const flash = props.searchParams ? await props.searchParams : {};
   if (!mongoose.Types.ObjectId.isValid(id)) notFound();
 
   const sess = await getSessionById(id);
@@ -30,10 +34,13 @@ export default async function EditSessionPage(props: Props) {
         </h1>
       </div>
 
+      <FormFlash error={flash.error} />
+
       <form
-        action={sealFormAction(updateSessionAction.bind(null, sid))}
+        action={updateSessionFormAction}
         className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
       >
+        <input type="hidden" name="rowId" value={sid} />
         <div>
           <label className="mb-1 block text-sm font-medium">Name</label>
           <input

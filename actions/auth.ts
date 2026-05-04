@@ -69,8 +69,8 @@ export async function bootstrapAdminAction(
   redirect("/admin/dashboard");
 }
 
-/** Accepts optional FormData from <form action> (React progressive enhancement). */
-export async function logoutAction(_formData?: FormData) {
+/** Form-compatible server action — FormData ignored. */
+export async function logoutAction(_formData?: FormData): Promise<void> {
   void _formData;
   await clearAdminSessionCookie();
   redirect("/admin/login");

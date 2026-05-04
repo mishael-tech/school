@@ -1,14 +1,14 @@
 import Link from "next/link";
 import mongoose from "mongoose";
-import { sealFormAction } from "@/lib/seal-form-action";
 import { upsertScoreAction, updateScoreNumericAction } from "@/actions/scores";
+import { FormFlash } from "@/components/admin/FormFlash";
 import { DeleteScoreButton } from "@/components/admin/DeleteScoreButton";
 import { listScoresByWeek } from "@/services/score.service";
 import { listStudents } from "@/services/student.service";
 import { listWeeks } from "@/services/week.service";
 
 type Props = {
-  searchParams: Promise<{ weekId?: string }>;
+  searchParams: Promise<{ weekId?: string; error?: string; ok?: string }>;
 };
 
 function weekTitle(w: {
@@ -77,6 +77,13 @@ export default async function AdminScoresPage(props: Props) {
         </p>
       </div>
 
+      <FormFlash
+        error={searchParams.error}
+        success={
+          searchParams.ok === "1" ? "Score saved successfully." : undefined
+        }
+      />
+
       <section className="flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
         <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
           Week:
@@ -116,7 +123,7 @@ export default async function AdminScoresPage(props: Props) {
             value.
           </p>
           <form
-            action={sealFormAction(upsertScoreAction)}
+            action={upsertScoreAction}
             className="mt-4 flex flex-wrap items-end gap-4"
           >
             <input type="hidden" name="weekId" value={activeWeekId} />
@@ -191,10 +198,15 @@ export default async function AdminScoresPage(props: Props) {
                     <td className="px-4 py-3">{label}</td>
                     <td className="px-4 py-3">
                       <form
-                        action={sealFormAction(updateScoreNumericAction)}
+                        action={updateScoreNumericAction}
                         className="flex max-w-xs items-center gap-2"
                       >
                         <input type="hidden" name="id" value={id} />
+                        <input
+                          type="hidden"
+                          name="contextWeekId"
+                          value={activeWeekId}
+                        />
                         <input
                           name="score"
                           type="number"

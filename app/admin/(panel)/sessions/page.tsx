@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { createSessionAction } from "@/actions/sessions";
-import { sealFormAction } from "@/lib/seal-form-action";
+import { FormFlash } from "@/components/admin/FormFlash";
 import { DeleteSessionButton } from "@/components/admin/DeleteSessionButton";
 import { listSessions } from "@/services/session.service";
 
-export default async function AdminSessionsPage() {
+type Props = { searchParams?: Promise<{ error?: string; ok?: string }> };
+
+export default async function AdminSessionsPage(props: Props) {
+  const sp = props.searchParams ? await props.searchParams : {};
   const sessions = await listSessions();
 
   return (
@@ -19,12 +22,17 @@ export default async function AdminSessionsPage() {
         </p>
       </div>
 
+      <FormFlash
+        error={sp.error}
+        success={sp.ok === "1" ? "Session saved successfully." : undefined}
+      />
+
       <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
           New session
         </h2>
         <form
-          action={sealFormAction(createSessionAction)}
+          action={createSessionAction}
           className="mt-4 flex flex-wrap items-end gap-4"
         >
           <div className="min-w-[200px] flex-1">

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { logoutAction } from "@/actions/auth";
-import { sealFormAction } from "@/lib/seal-form-action";
 
 const links = [
   { href: "/admin/dashboard", label: "Dashboard" },
@@ -35,7 +34,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <div className="border-t border-slate-200 p-2 dark:border-slate-800">
-          <form action={sealFormAction(logoutAction)}>
+          <form action={logoutAction}>
             <button
               type="submit"
               className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"

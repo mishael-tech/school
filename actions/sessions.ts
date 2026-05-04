@@ -11,44 +11,54 @@ import { sessionCreateSchema, sessionUpdateSchema } from "@/utils/validators";
 
 export type ActionResult = { ok?: true; error?: string };
 
-export async function createSessionAction(
-  formData: FormData,
-): Promise<ActionResult> {
+function q(msg: string) {
+  return encodeURIComponent(msg);
+}
+
+export async function createSessionAction(formData: FormData): Promise<void> {
   const raw = { name: String(formData.get("name") ?? "") };
   const parsed = sessionCreateSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().formErrors.join(" ") };
+    redirect(
+      `/admin/sessions?error=${q(parsed.error.flatten().formErrors.join(" ") || "Invalid input")}`,
+    );
   }
   try {
     await createSession(parsed.data);
   } catch {
-    return { error: "Could not save session — name may already exist." };
+    redirect(
+      `/admin/sessions?error=${q("Could not save session — name may already exist.")}`,
+    );
   }
   revalidatePath("/admin/sessions");
   revalidatePath("/");
-  return { ok: true };
+  redirect("/admin/sessions?ok=1");
 }
 
-export async function updateSessionAction(
-  id: string,
-  formData: FormData,
-): Promise<ActionResult> {
+export async function updateSessionFormAction(formData: FormData): Promise<void> {
+  const id = String(formData.get("rowId") ?? "");
+  if (!id) redirect(`/admin/sessions?error=${q("Missing session id.")}`);
+
   const raw = {
     name: formData.get("name") != null ? String(formData.get("name")) : undefined,
   };
   const parsed = sessionUpdateSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().formErrors.join(" ") };
+    redirect(
+      `/admin/sessions/${id}?error=${q(parsed.error.flatten().formErrors.join(" ") || "Invalid input")}`,
+    );
   }
   try {
     const updated = await updateSession(id, parsed.data);
-    if (!updated) return { error: "Session not found." };
+    if (!updated) {
+      redirect(`/admin/sessions/${id}?error=${q("Session not found.")}`);
+    }
   } catch {
-    return { error: "Could not update session." };
+    redirect(`/admin/sessions/${id}?error=${q("Could not update session.")}`);
   }
   revalidatePath("/admin/sessions");
   revalidatePath("/");
-  redirect("/admin/sessions");
+  redirect("/admin/sessions?ok=1");
 }
 
 export async function deleteSessionAction(formData: FormData): Promise<ActionResult> {

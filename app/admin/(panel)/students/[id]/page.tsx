@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { updateStudentAction } from "@/actions/students";
-import { sealFormAction } from "@/lib/seal-form-action";
 import mongoose from "mongoose";
+import { updateStudentFormAction } from "@/actions/students";
+import { FormFlash } from "@/components/admin/FormFlash";
 import { getStudentById } from "@/services/student.service";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ error?: string }>;
+};
 
 export default async function EditStudentPage(props: Props) {
   const { id } = await props.params;
+  const flash = props.searchParams ? await props.searchParams : {};
   if (!mongoose.Types.ObjectId.isValid(id)) notFound();
 
   const student = await getStudentById(id);
@@ -31,10 +35,13 @@ export default async function EditStudentPage(props: Props) {
         <p className="mt-1 text-slate-600 dark:text-slate-400">{student.name}</p>
       </div>
 
+      <FormFlash error={flash.error} />
+
       <form
-        action={sealFormAction(updateStudentAction.bind(null, sid))}
-        className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-4"
+        action={updateStudentFormAction}
+        className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
       >
+        <input type="hidden" name="rowId" value={sid} />
         <div>
           <label className="mb-1 block text-sm font-medium">Full name</label>
           <input
@@ -50,7 +57,7 @@ export default async function EditStudentPage(props: Props) {
             name="studentId"
             required
             defaultValue={student.studentId}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-950 font-mono text-sm"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm dark:border-slate-600 dark:bg-slate-950"
           />
         </div>
         <div>

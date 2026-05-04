@@ -11,9 +11,11 @@ import { studentCreateSchema, studentUpdateSchema } from "@/utils/validators";
 
 export type ActionResult = { ok?: true; error?: string };
 
-export async function createStudentAction(
-  formData: FormData,
-): Promise<ActionResult> {
+function q(msg: string) {
+  return encodeURIComponent(msg);
+}
+
+export async function createStudentAction(formData: FormData): Promise<void> {
   const raw = {
     name: String(formData.get("name") ?? ""),
     studentId: String(formData.get("studentId") ?? ""),
@@ -21,7 +23,9 @@ export async function createStudentAction(
   };
   const parsed = studentCreateSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().formErrors.join(" ") };
+    redirect(
+      `/admin/students?error=${q(parsed.error.flatten().formErrors.join(" ") || "Invalid input")}`,
+    );
   }
   try {
     await createStudent(parsed.data);
@@ -30,16 +34,18 @@ export async function createStudentAction(
       e && typeof e === "object" && "code" in e && (e as { code?: number }).code === 11000
         ? "A student with that ID already exists."
         : "Could not save student.";
-    return { error: msg };
+    redirect(`/admin/students?error=${q(msg)}`);
   }
   revalidatePath("/admin/students");
-  return { ok: true };
+  redirect("/admin/students?ok=1");
 }
 
-export async function updateStudentAction(
-  id: string,
-  formData: FormData,
-): Promise<ActionResult> {
+/** Bound to form with hidden `rowId` (student Mongo _id). */
+export async function updateStudentFormAction(formData: FormData): Promise<void> {
+  const id = String(formData.get("rowId") ?? "");
+  if (!id) {
+    redirect(`/admin/students?error=${q("Missing student id.")}`);
+  }
   const raw = {
     name:
       formData.get("name") != null ? String(formData.get("name")) : undefined,
@@ -52,20 +58,24 @@ export async function updateStudentAction(
   };
   const parsed = studentUpdateSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().formErrors.join(" ") };
+    redirect(
+      `/admin/students/${id}?error=${q(parsed.error.flatten().formErrors.join(" ") || "Invalid input")}`,
+    );
   }
   try {
     const updated = await updateStudent(id, parsed.data);
-    if (!updated) return { error: "Student not found." };
+    if (!updated) {
+      redirect(`/admin/students/${id}?error=${q("Student not found.")}`);
+    }
   } catch (e: unknown) {
     const msg =
       e && typeof e === "object" && "code" in e && (e as { code?: number }).code === 11000
         ? "A student with that ID already exists."
         : "Could not update student.";
-    return { error: msg };
+    redirect(`/admin/students/${id}?error=${q(msg)}`);
   }
   revalidatePath("/admin/students");
-  redirect("/admin/students");
+  redirect("/admin/students?ok=1");
 }
 
 export async function deleteStudentAction(formData: FormData): Promise<ActionResult> {

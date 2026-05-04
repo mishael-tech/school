@@ -1,16 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import mongoose from "mongoose";
-import { updateWeekAction } from "@/actions/weeks";
-import { sealFormAction } from "@/lib/seal-form-action";
+import { updateWeekFormAction } from "@/actions/weeks";
+import { FormFlash } from "@/components/admin/FormFlash";
 import { mongoRefToIdString } from "@/utils/mongo-ref";
 import { listSessions } from "@/services/session.service";
 import { getWeekById } from "@/services/week.service";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ error?: string }>;
+};
 
 export default async function EditWeekPage(props: Props) {
   const { id } = await props.params;
+  const flash = props.searchParams ? await props.searchParams : {};
   if (!mongoose.Types.ObjectId.isValid(id)) notFound();
 
   const [weekDoc, sessions] = await Promise.all([
@@ -44,6 +48,8 @@ export default async function EditWeekPage(props: Props) {
         </h1>
       </div>
 
+      <FormFlash error={flash.error} />
+
       {!sessionsSelectable ? (
         <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
           No academic sessions exist. Create one under{" "}
@@ -58,9 +64,10 @@ export default async function EditWeekPage(props: Props) {
       ) : null}
 
       <form
-        action={sealFormAction(updateWeekAction.bind(null, sid))}
+        action={updateWeekFormAction}
         className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
       >
+        <input type="hidden" name="rowId" value={sid} />
         <div>
           <label className="mb-1 block text-sm font-medium">Session</label>
           <select

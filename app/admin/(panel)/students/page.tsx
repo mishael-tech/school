@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { createStudentAction } from "@/actions/students";
-import { sealFormAction } from "@/lib/seal-form-action";
+import { FormFlash } from "@/components/admin/FormFlash";
 import { DeleteStudentButton } from "@/components/admin/DeleteStudentButton";
 import { listStudents } from "@/services/student.service";
 
-export default async function AdminStudentsPage() {
+type Props = { searchParams?: Promise<{ error?: string; ok?: string }> };
+
+export default async function AdminStudentsPage(props: Props) {
+  const sp = props.searchParams ? await props.searchParams : {};
   const students = await listStudents();
 
   return (
@@ -19,12 +22,17 @@ export default async function AdminStudentsPage() {
         </p>
       </div>
 
+      <FormFlash
+        error={sp.error}
+        success={sp.ok === "1" ? "Student saved successfully." : undefined}
+      />
+
       <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
           Add student
         </h2>
         <form
-          action={sealFormAction(createStudentAction)}
+          action={createStudentAction}
           className="mt-4 grid gap-4 sm:grid-cols-3"
         >
           <div>
@@ -40,7 +48,7 @@ export default async function AdminStudentsPage() {
             <input
               name="studentId"
               required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-950"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-950 font-mono text-sm"
               placeholder="e.g., 2024001"
             />
           </div>

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
   deleteScore,
   upsertScore,
@@ -10,43 +11,67 @@ import { scoreUpdateSchema, scoreUpsertSchema } from "@/utils/validators";
 
 export type ActionResult = { ok?: true; error?: string };
 
-export async function upsertScoreAction(formData: FormData): Promise<ActionResult> {
+function scoresPath(weekId: string | undefined, err?: string, ok?: boolean) {
+  const base = "/admin/scores";
+  const params = new URLSearchParams();
+  if (weekId) params.set("weekId", weekId);
+  if (err) params.set("error", err);
+  if (ok) params.set("ok", "1");
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
+}
+
+export async function upsertScoreAction(formData: FormData): Promise<void> {
+  const weekId = String(formData.get("weekId") ?? "");
   const raw = {
     studentId: String(formData.get("studentId") ?? ""),
-    weekId: String(formData.get("weekId") ?? ""),
+    weekId,
     score: Number(formData.get("score")),
   };
   const parsed = scoreUpsertSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().formErrors.join(" ") };
+    redirect(
+      scoresPath(
+        weekId || undefined,
+        parsed.error.flatten().formErrors.join(" ") || "Invalid input",
+      ),
+    );
   }
   try {
     await upsertScore(parsed.data);
   } catch {
-    return { error: "Could not save score." };
+    redirect(scoresPath(weekId || undefined, "Could not save score."));
   }
   revalidatePath("/leaderboard");
   revalidatePath("/admin/scores");
-  return { ok: true };
+  redirect(scoresPath(weekId || undefined, undefined, true));
 }
 
-export async function updateScoreNumericAction(
-  formData: FormData,
-): Promise<ActionResult> {
+export async function updateScoreNumericAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id") ?? "");
+  const weekId = String(formData.get("contextWeekId") ?? "");
   const raw = {
     score: Number(formData.get("score")),
   };
   const parsed = scoreUpdateSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().formErrors.join(" ") };
+    redirect(
+      scoresPath(
+        weekId || undefined,
+        parsed.error.flatten().formErrors.join(" ") || "Invalid score",
+      ),
+    );
   }
-  if (!id) return { error: "Missing score id." };
+  if (!id) {
+    redirect(scoresPath(weekId || undefined, "Missing score id."));
+  }
   const updated = await updateScoreById(id, parsed.data);
-  if (!updated) return { error: "Score row not found." };
+  if (!updated) {
+    redirect(scoresPath(weekId || undefined, "Score row not found."));
+  }
   revalidatePath("/leaderboard");
   revalidatePath("/admin/scores");
-  return { ok: true };
+  redirect(scoresPath(weekId || undefined, undefined, true));
 }
 
 export async function deleteScoreFormAction(

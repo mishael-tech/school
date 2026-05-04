@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createWeekAction } from "@/actions/weeks";
-import { sealFormAction } from "@/lib/seal-form-action";
+import { FormFlash } from "@/components/admin/FormFlash";
 import { DeleteWeekButton } from "@/components/admin/DeleteWeekButton";
 import { listSessions } from "@/services/session.service";
 import { listWeeks } from "@/services/week.service";
@@ -25,9 +25,11 @@ function sessionLabel(raw: PopulatedWeek) {
   return "(session)";
 }
 
-export default async function AdminWeeksPage() {
-  const [sessions, weeks] = await Promise.all([listSessions(), listWeeks()]);
+type Props = { searchParams?: Promise<{ error?: string; ok?: string }> };
 
+export default async function AdminWeeksPage(props: Props) {
+  const sp = props.searchParams ? await props.searchParams : {};
+  const [sessions, weeks] = await Promise.all([listSessions(), listWeeks()]);
   const weekRows = weeks as PopulatedWeek[];
 
   return (
@@ -41,12 +43,17 @@ export default async function AdminWeeksPage() {
         </p>
       </div>
 
+      <FormFlash
+        error={sp.error}
+        success={sp.ok === "1" ? "Week saved successfully." : undefined}
+      />
+
       <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
           Add week
         </h2>
         <form
-          action={sealFormAction(createWeekAction)}
+          action={createWeekAction}
           className="mt-4 flex flex-wrap items-end gap-4"
         >
           <div>

@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { HomePicker } from "@/components/HomePicker";
+import { getPublicDisplaySettings } from "@/services/display-settings.service";
 import { listSessions } from "@/services/session.service";
 import { listWeeksBySession } from "@/services/week.service";
 
 export default async function HomePage() {
-  const sessionsRaw = await listSessions();
+  const [{ subjectLabel }, sessionsRaw] = await Promise.all([
+    getPublicDisplaySettings(),
+    listSessions(),
+  ]);
 
   const sessions = sessionsRaw.map((s) => ({
     id: s._id.toString(),
@@ -30,10 +34,10 @@ export default async function HomePage() {
     <div className="space-y-10">
       <section className="space-y-3">
         <p className="text-sm font-medium uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
-          Classroom scoreboard
+          Classroom scoreboard · {subjectLabel}
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-          Math weekly results
+          {subjectLabel} weekly results
         </h1>
         <p className="max-w-prose text-lg text-slate-600 dark:text-slate-300">
           Choose an academic session and week to see how the class ranked on

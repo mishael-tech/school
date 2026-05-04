@@ -51,18 +51,24 @@ export default async function AdminWeeksPage() {
         >
           <div>
             <label className="mb-1 block text-sm font-medium">Session</label>
-            <select
-              name="sessionId"
-              required
-              defaultValue={sessions[0]?._id.toString()}
-              className="min-w-[200px] rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-950"
-            >
-              {sessions.map((s) => (
-                <option key={s._id.toString()} value={s._id.toString()}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            {sessions.length === 0 ? (
+              <p className="max-w-md text-sm text-slate-500 dark:text-slate-400">
+                Create an academic session first (see Sessions in the sidebar).
+              </p>
+            ) : (
+              <select
+                name="sessionId"
+                required
+                defaultValue={sessions[0]._id.toString()}
+                className="min-w-[200px] rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-950"
+              >
+                {sessions.map((s) => (
+                  <option key={s._id.toString()} value={s._id.toString()}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium">Week number</label>

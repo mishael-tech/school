@@ -13,6 +13,10 @@ export const bootstrapAdminSchema = z.object({
   password: z.string().min(10).max(256),
 });
 
+export const siteDisplaySubjectSchema = z.object({
+  subjectLabel: z.string().min(1).max(80).trim(),
+});
+
 export const studentCreateSchema = z.object({
   name: z.string().min(1).max(120).trim(),
   studentId: z.string().min(1).max(80).trim(),

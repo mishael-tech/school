@@ -24,7 +24,15 @@ export async function loginAction(prev: ActionResult, formData: FormData): Promi
   }
   const user = await verifyCredentials(parsed.data.email, parsed.data.password);
   if (!user) return { error: "Invalid email or password." };
-  const token = await signAdminJwt({ sub: user.id, email: user.email });
+  let token: string;
+  try {
+    token = await signAdminJwt({ sub: user.id, email: user.email });
+  } catch {
+    return {
+      error:
+        "Server configuration error (missing JWT_SECRET). Contact your administrator.",
+    };
+  }
   await setAdminSessionCookie(token);
   revalidatePath("/", "layout");
   redirect("/admin/dashboard");
@@ -48,12 +56,22 @@ export async function bootstrapAdminAction(
   await createAdmin(parsed.data.email, parsed.data.password);
   const user = await verifyCredentials(parsed.data.email, parsed.data.password);
   if (!user) return { error: "Could not sign in after bootstrap." };
-  const token = await signAdminJwt({ sub: user.id, email: user.email });
+  let token: string;
+  try {
+    token = await signAdminJwt({ sub: user.id, email: user.email });
+  } catch {
+    return {
+      error:
+        "Server configuration error (missing JWT_SECRET). Set it and try again.",
+    };
+  }
   await setAdminSessionCookie(token);
   redirect("/admin/dashboard");
 }
 
-export async function logoutAction() {
+/** Accepts optional FormData from <form action> (React progressive enhancement). */
+export async function logoutAction(_formData?: FormData) {
+  void _formData;
   await clearAdminSessionCookie();
   redirect("/admin/login");
 }

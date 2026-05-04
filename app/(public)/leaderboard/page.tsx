@@ -6,6 +6,8 @@ import type { LeaderboardEntry } from "@/services/ranking.service";
 import { getLeaderboardForWeek } from "@/services/ranking.service";
 import { getSessionById } from "@/services/session.service";
 import { getWeekById } from "@/services/week.service";
+import { getPublicDisplaySettings } from "@/services/display-settings.service";
+import { mongoRefToIdString } from "@/utils/mongo-ref";
 
 type Props = {
   searchParams: Promise<{ weekId?: string; q?: string }>;
@@ -23,8 +25,11 @@ async function leaderboardWithContext(weekId: string, q?: string | null) {
   const weekDoc = await getWeekById(weekId);
   if (weekDoc) {
     weekLabel = `Week ${weekDoc.weekNumber}`;
-    const sid = weekDoc.sessionId?.toString();
-    const sess = sid ? await getSessionById(sid) : null;
+    const sidRaw = mongoRefToIdString(weekDoc.sessionId as unknown).trim();
+    const sess =
+      sidRaw && mongoose.Types.ObjectId.isValid(sidRaw)
+        ? await getSessionById(sidRaw)
+        : null;
     if (sess) sessionName = sess.name;
   }
 
@@ -32,7 +37,10 @@ async function leaderboardWithContext(weekId: string, q?: string | null) {
 }
 
 export default async function LeaderboardPage(props: Props) {
-  const sp = await props.searchParams;
+  const [{ subjectLabel }, sp] = await Promise.all([
+    getPublicDisplaySettings(),
+    props.searchParams,
+  ]);
   const weekIdRaw = typeof sp.weekId === "string" ? sp.weekId : undefined;
   const q = typeof sp.q === "string" ? sp.q : undefined;
 
@@ -80,9 +88,9 @@ export default async function LeaderboardPage(props: Props) {
           {heading}
         </h1>
         <p className="text-slate-600 dark:text-slate-300">
-          Highest scores listed first — ties are broken alphabetically by
-          student name. The top three places are highlighted across the entire
-          class for that week.
+          {subjectLabel} · highest scores listed first — ties are broken
+          alphabetically by student name. The top three places are highlighted
+          across the entire class for that week.
         </p>
       </section>
 

@@ -25,6 +25,27 @@ export default async function AdminDashboardPage() {
         </p>
       </div>
 
+      <section>
+        <Link
+          href="/admin/settings"
+          className="mb-6 flex rounded-xl border border-indigo-200 bg-indigo-50/80 p-4 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950/30 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/50"
+        >
+          <div>
+            <div className="text-sm font-semibold text-indigo-900 dark:text-indigo-100">
+              Subject &amp; branding
+            </div>
+            <p className="mt-1 max-w-xl text-xs text-indigo-800 dark:text-indigo-200">
+              Change the subject label students see (
+              <span className="font-medium">Science</span>,{" "}
+              <span className="font-medium">Algebra</span>, etc.).
+            </p>
+            <span className="mt-2 inline-flex text-xs font-medium text-indigo-600 dark:text-indigo-300">
+              Open settings →
+            </span>
+          </div>
+        </Link>
+      </section>
+
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards(stats).map((c) => (
           <Link

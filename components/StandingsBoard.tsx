@@ -53,13 +53,13 @@ export function StandingsBoard({ data }: Props) {
         <table className="w-full min-w-[720px] border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-900 text-white dark:border-slate-700 dark:bg-slate-950">
-              <th className="sticky left-0 z-20 bg-slate-900 px-3 py-3 pl-4 text-xs font-semibold uppercase tracking-wide dark:bg-slate-950">
+              <th className="whitespace-nowrap bg-slate-900 px-3 py-3 pl-4 text-xs font-semibold uppercase tracking-wide dark:bg-slate-950">
                 Pos
               </th>
-              <th className="sticky left-[3rem] z-20 bg-slate-900 px-3 py-3 text-xs font-semibold uppercase tracking-wide dark:bg-slate-950">
+              <th className="whitespace-nowrap bg-slate-900 px-3 py-3 text-xs font-semibold uppercase tracking-wide dark:bg-slate-950">
                 Student
               </th>
-              <th className="sticky left-[12rem] z-20 whitespace-nowrap bg-slate-900 px-3 py-3 text-xs font-semibold uppercase tracking-wide dark:bg-slate-950 md:left-[13rem]">
+              <th className="whitespace-nowrap bg-slate-900 px-3 py-3 text-xs font-semibold uppercase tracking-wide dark:bg-slate-950">
                 Class
               </th>
               {weeks.map((w) => (
@@ -111,14 +111,14 @@ function StandingsRowCells({
   weeks: { id: string }[];
 }) {
   const topThree = row.rank <= 3;
-  const stickyBg = topThree
+  const rowBg = topThree
     ? "bg-amber-50 dark:bg-amber-950/30"
     : "bg-white odd:bg-white even:bg-slate-50/90 dark:bg-slate-900 dark:odd:bg-slate-900 dark:even:bg-slate-950/80";
 
   return (
     <tr className="border-b border-slate-100 dark:border-slate-800">
       <td
-        className={`sticky left-0 z-10 border-r border-slate-100 px-3 py-2.5 pl-4 tabular-nums dark:border-slate-800 ${stickyBg}`}
+        className={`border-r border-slate-100 px-3 py-2.5 pl-4 tabular-nums dark:border-slate-800 ${rowBg}`}
       >
         <span
           className={
@@ -131,12 +131,12 @@ function StandingsRowCells({
         </span>
       </td>
       <td
-        className={`sticky left-[3rem] z-10 max-w-[11rem] truncate border-r border-slate-100 px-3 py-2.5 font-medium text-slate-900 dark:border-slate-800 dark:text-slate-100 md:max-w-[14rem] ${stickyBg}`}
+        className={`border-r border-slate-100 px-3 py-2.5 font-medium text-slate-900 whitespace-nowrap dark:border-slate-800 dark:text-slate-100 ${rowBg}`}
       >
         {row.name}
       </td>
       <td
-        className={`sticky left-[12rem] z-10 whitespace-nowrap border-r border-slate-200 px-3 py-2.5 text-slate-700 dark:border-slate-700 dark:text-slate-300 md:left-[13rem] ${stickyBg}`}
+        className={`whitespace-nowrap border-r border-slate-200 px-3 py-2.5 text-slate-700 dark:border-slate-700 dark:text-slate-300 ${rowBg}`}
       >
         {row.class}
       </td>

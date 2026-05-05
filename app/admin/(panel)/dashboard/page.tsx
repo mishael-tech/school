@@ -9,6 +9,8 @@ const cards = (
     { label: "Academic sessions", value: stats.sessions, href: "/admin/sessions" },
     { label: "Weeks", value: stats.weeks, href: "/admin/weeks" },
     { label: "Stored score rows", value: stats.scores, href: "/admin/scores" },
+    { label: "Gallery images", value: stats.galleryImages, href: "/admin/gallery" },
+    { label: "Announcements", value: stats.announcements, href: "/admin/announcements" },
   ] as const;
 
 export default async function AdminDashboardPage() {
@@ -46,7 +48,7 @@ export default async function AdminDashboardPage() {
         </Link>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards(stats).map((c) => (
           <Link
             key={c.label}

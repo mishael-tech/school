@@ -81,6 +81,17 @@ export const scoreGridBatchSchema = z.object({
   cells: z.array(scoreGridCellSchema).max(5000),
 });
 
+export const galleryCreateFormSchema = z.object({
+  title: z.string().min(1).max(160).trim(),
+  caption: z.string().max(600).trim(),
+  imageUrl: optionalUrlOrEmpty,
+});
+
+export const announcementCreateSchema = z.object({
+  title: z.string().min(1).max(200).trim(),
+  body: z.string().min(1).max(12000).trim(),
+});
+
 export type StudentCreateInput = z.infer<typeof studentCreateSchema>;
 export type ScoreUpsertInput = z.infer<typeof scoreUpsertSchema>;
 

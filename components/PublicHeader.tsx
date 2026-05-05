@@ -11,9 +11,15 @@ export async function PublicHeader() {
         <Link href="/" className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
           {brand}
         </Link>
-        <nav className="flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-slate-600 dark:text-slate-300">
           <Link className="hover:text-indigo-600 dark:hover:text-indigo-400" href="/standings">
             Standings
+          </Link>
+          <Link className="hover:text-indigo-600 dark:hover:text-indigo-400" href="/gallery">
+            Gallery
+          </Link>
+          <Link className="hover:text-indigo-600 dark:hover:text-indigo-400" href="/announcements">
+            Announcements
           </Link>
           <Link
             className="rounded-md border border-slate-200 px-3 py-1.5 hover:border-indigo-300 hover:text-indigo-600 dark:border-slate-700 dark:hover:border-indigo-500 dark:hover:text-indigo-300"

@@ -8,6 +8,8 @@ const links = [
   { href: "/admin/sessions", label: "Sessions" },
   { href: "/admin/weeks", label: "Weeks" },
   { href: "/admin/scores", label: "Scores" },
+  { href: "/admin/gallery", label: "Gallery" },
+  { href: "/admin/announcements", label: "Announcements" },
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

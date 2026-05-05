@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import type { GalleryGridItem } from "@/components/GalleryGrid";
+import { GalleryGrid } from "@/components/GalleryGrid";
 import { listGalleryImages } from "@/services/gallery.service";
 
 export const metadata: Metadata = {
@@ -11,7 +13,14 @@ function imageSrc(item: { _id: string; imageUrl: string }) {
 }
 
 export default async function PublicGalleryPage() {
-  const items = await listGalleryImages();
+  const rows = await listGalleryImages();
+
+  const items: GalleryGridItem[] = rows.map((item) => ({
+    id: item._id,
+    src: imageSrc(item),
+    title: item.title,
+    caption: item.caption,
+  }));
 
   return (
     <div className="space-y-8">
@@ -20,7 +29,7 @@ export default async function PublicGalleryPage() {
           Gallery
         </h1>
         <p className="mt-2 text-slate-600 dark:text-slate-400">
-          Photos shared by your teachers.
+          Photos shared by your teachers. Tap a photo to view it fullscreen.
         </p>
       </header>
 
@@ -29,33 +38,7 @@ export default async function PublicGalleryPage() {
           No photos in the gallery yet.
         </p>
       ) : (
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <li
-              key={item._id}
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
-            >
-              <div className="aspect-[4/3] bg-slate-100 dark:bg-slate-800">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imageSrc(item)}
-                  alt={item.title}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <div className="p-4">
-                <h2 className="font-semibold text-slate-900 dark:text-white">{item.title}</h2>
-                {item.caption ? (
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                    {item.caption}
-                  </p>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <GalleryGrid items={items} />
       )}
     </div>
   );
